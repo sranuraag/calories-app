@@ -4,11 +4,21 @@
   "description": "Express JS server for Calories App",
   "main": "app.js",
   "scripts": {
+    "devStart": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Anuraag",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "bcrypt": "^5.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "pg": "^8.7.1",
+    "pino": "^6.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
