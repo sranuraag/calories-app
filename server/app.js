@@ -1,8 +1,12 @@
 require('dotenv').config(); 
 const express = require('express'); 
-const { UserRouter, FoodEntryRouter } = require('./routes'); 
+const { UserRouter, FoodEntryRouter } = require('./routes');
+
+const cors = require('cors'); 
 
 const app = express();
+
+app.use(cors()); 
 
 app.use(express.json()); 
 

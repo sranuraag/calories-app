@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+.main {
+  height: 100vh;
+}
+
+.field-label {
+  width: 150px;
+}

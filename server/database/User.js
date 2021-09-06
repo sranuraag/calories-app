@@ -31,7 +31,25 @@ const db_getUser = async (email) => {
   }
 };
 
+const db_getAllUsers = async () => {
+  try {
+    logger.info("Inside db_getAllUsers.");
+
+    let query = `select id, email, first_name, last_name, role from users`;
+
+    let result = await executeQuery(query);
+
+    return result;
+
+  } catch (error) {
+    logger.error("Error in db_getAllUsers");
+    console.log(error);
+    throw new Error();
+  }
+}
+
 module.exports = {
   db_createUser,
   db_getUser,
+  db_getAllUsers
 };

@@ -1,3 +1,4 @@
+const moment = require('moment'); 
 const { logger } = require("../utils");
 const {
   db_getAllFoodEntries,
@@ -99,6 +100,14 @@ const createFoodEntryService = async (
       };
     }
 
+    // Validating that datetime provided is not future dated
+    if (datetime > moment().valueOf()) {
+      return {
+        valid: false,
+        error: "Date/Time cannot be future dated.",
+      };
+    }
+
     // Setting the current user ID as the one for FoodEntry record
     if (!user_id) {
       user_id = user.id;
@@ -142,6 +151,14 @@ const updateFoodEntryService = async (
       return {
         valid: false,
         error: "Only Admin user can provide User ID while updating FoodEntry.",
+      };
+    }
+
+    // Validating that datetime provided is not future dated
+    if (datetime && datetime > moment().valueOf()) {
+      return {
+        valid: false,
+        error: "Date/Time cannot be future dated.",
       };
     }
 

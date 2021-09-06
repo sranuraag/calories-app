@@ -1,6 +1,6 @@
 const { logger } = require("../utils");
 const bcrypt = require("bcrypt");
-const { db_getUser } = require("../database");
+const { db_getUser, db_getAllUsers } = require("../database");
 const jwt = require("jsonwebtoken");
 
 const sanitizeUserDetails = async (first_name, last_name, email, password) => {
@@ -114,8 +114,35 @@ const loginUserService = async (email, password) => {
   }
 };
 
+const getAllUsersService = async (user) => {
+  try {
+    logger.info("Inside getAllUsersService.");
+
+    // Validating that current user is an Admin
+    if (user.role !== 'Admin') {
+      return {
+        valid: false,
+        error: 'Only Admin user can access user details.'
+      }
+    }
+
+    // Get all user details
+    let queryResponse = await db_getAllUsers();
+
+    return {
+      valid: true,
+      data: queryResponse
+    };
+  } catch (error) {
+    logger.error("Error in getAllUsersService.");
+    console.log(error);
+    throw new Error();
+  }
+}
+
 module.exports = {
   sanitizeUserDetails,
   getUser,
   loginUserService,
+  getAllUsersService
 };

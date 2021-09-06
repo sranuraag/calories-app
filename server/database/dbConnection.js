@@ -29,6 +29,7 @@ const pgConnectionPool = () => {
 const executeQuery = async (query) => {
   try {
     logger.info("Inside executeQuery.");
+    logger.info(query); 
     const client = pgConnectionPool();
     const result = await client.query(query);
     return result.rows;

@@ -1,4 +1,4 @@
-const { createUser, loginUser } = require("./User");
+const { createUser, loginUser, getAllUsers } = require("./User");
 
 const {
   getAllFoodEntries,
@@ -11,6 +11,7 @@ const {
 module.exports = {
   createUser,
   loginUser,
+  getAllUsers,
   getAllFoodEntries,
   getFoodEntry,
   createFoodEntry,

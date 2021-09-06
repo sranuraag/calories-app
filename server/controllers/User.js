@@ -4,12 +4,15 @@ const {
   sanitizeUserDetails,
   getUser,
   loginUserService,
+  getAllUsersService
 } = require("../services");
 
 // Controller for POST /users
 const createUser = async (req, res) => {
   try {
     logger.debug("Inside create User controller");
+
+    console.log(req.body);
 
     // Extract user details from request body
     let { first_name, last_name, email, password } = req.body;
@@ -72,4 +75,26 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUser };
+// Controller for GET /users
+const getAllUsers = async (req, res) => {
+  try {
+    logger.info("Inside getAllUsers.");
+
+    let user = req.user;
+
+    // Call getAllUsersService available in services folder
+    let response = await getAllUsersService(user);
+
+    if (response.valid) {
+      return res.status(200).json({ status: "success", data: response.data });
+    } else {
+      return res.status(400).json({ error: response.error });
+    }
+  } catch (error) {
+    logger.error("Error in getAllUsers.");
+    console.log(error);
+    return res.status(500).json({ error: "Error while fetching users." });
+  }
+};
+
+module.exports = { createUser, loginUser, getAllUsers };

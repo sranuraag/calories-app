@@ -16,6 +16,6 @@ create table foodentries (
 	id int default nextval('foodentry_id_seq') primary key,
 	datetime timestamp,
 	food text, 
-	calories int,
+	calories float,
 	user_id int references users(id)
 ); 

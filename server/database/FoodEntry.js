@@ -10,9 +10,11 @@ const db_getAllFoodEntries = async (user) => {
     let query = "";
 
     if (user.role === "Admin") {
-      query = `select id, EXTRACT( EPOCH FROM datetime ), food, calories, user_id from foodentries`;
+      query = `select a.id as id, EXTRACT( EPOCH FROM a.datetime ) as datetime, a.food as food, a.calories as calories, a.user_id as user_id, b.email as email  from foodentries a, users b where 
+      a.user_id = b.id`;
     } else {
-      query = `select id, EXTRACT( EPOCH FROM datetime ), food, calories, user_id from foodentries where user_id = ${user.id}`;
+      query = `select a.id as id, EXTRACT( EPOCH FROM a.datetime ) as datetime, a.food as food, a.calories as calories, a.user_id as user_id, b.email as email  from foodentries a, users b where 
+      a.user_id = b.id and user_id = ${user.id}`;
     }
 
     let response = await executeQuery(query);
