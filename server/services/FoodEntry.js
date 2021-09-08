@@ -1,4 +1,4 @@
-const moment = require('moment'); 
+const moment = require("moment");
 const { logger } = require("../utils");
 const {
   db_getAllFoodEntries,
@@ -6,6 +6,9 @@ const {
   db_createFoodEntry,
   db_updateFoodEntry,
   db_deleteFoodEntry,
+  db_getAdminReport,
+  db_getUserById,
+  db_getDailyLimitExceededReport
 } = require("../database");
 
 const getAllFoodEntriesService = async (user) => {
@@ -84,6 +87,14 @@ const createFoodEntryService = async (
       };
     }
 
+    // Validating that food does not contain only spaces
+    if (food.trim().length <= 0) {
+      return {
+        valid: false,
+        error: "Food should have a non-empty input.",
+      };
+    }
+
     // Only Admin can create FoodEntry on behalf of other users
     if (user.role !== "Admin" && user_id) {
       return {
@@ -101,11 +112,43 @@ const createFoodEntryService = async (
     }
 
     // Validating that datetime provided is not future dated
-    if (datetime > moment().valueOf()) {
+    if (moment(datetime).valueOf() > moment().valueOf()) {
       return {
         valid: false,
         error: "Date/Time cannot be future dated.",
       };
+    }
+
+    // Validating that Calories is a number and its value is greater than 0
+    if (isNaN(calories)) {
+      return {
+        valid: false,
+        error: "Calories should be a number.",
+      };
+    } else if (calories <= 0) {
+      return {
+        valid: false,
+        error: "Calories value should be greater than 0.",
+      };
+    }
+
+    if (user_id) {
+      // FoodEntry cannot be created for an Admin
+      let foodEntryOwner = await db_getUserById(user_id);
+
+      if (foodEntryOwner.length === 0) {
+        return {
+          valid: false,
+          error: "User ID provided is not valid.",
+        };
+      } else {
+        if (foodEntryOwner[0].role === "Admin") {
+          return {
+            valid: false,
+            error: "Admin users cannot be selected as owner of a FoodEntry.",
+          };
+        }
+      }
     }
 
     // Setting the current user ID as the one for FoodEntry record
@@ -146,6 +189,14 @@ const updateFoodEntryService = async (
       };
     }
 
+    // Validating that food does not contain only spaces
+    if (food.trim().length <= 0) {
+      return {
+        valid: false,
+        error: "Food should have a non-empty input.",
+      };
+    }
+
     // Only Admin user can update FoodEntry records on behalf of other users
     if (user.role !== "Admin" && user_id) {
       return {
@@ -154,8 +205,40 @@ const updateFoodEntryService = async (
       };
     }
 
+    // Validating that Calories is a number and its value is greater than 0
+    if (isNaN(calories)) {
+      return {
+        valid: false,
+        error: "Calories should be a number.",
+      };
+    } else if (calories <= 0) {
+      return {
+        valid: false,
+        error: "Calories value should be greater than 0.",
+      };
+    }
+
+    if (user_id) {
+      // FoodEntry cannot be created for an Admin
+      let foodEntryOwner = await db_getUserById(user_id);
+
+      if (foodEntryOwner.length === 0) {
+        return {
+          valid: false,
+          error: "User ID provided is not valid.",
+        };
+      } else {
+        if (foodEntryOwner[0].role === "Admin") {
+          return {
+            valid: false,
+            error: "Admin users cannot be selected as owner of a FoodEntry.",
+          };
+        }
+      }
+    }
+
     // Validating that datetime provided is not future dated
-    if (datetime && datetime > moment().valueOf()) {
+    if (datetime && moment(datetime).valueOf() > moment().valueOf()) {
       return {
         valid: false,
         error: "Date/Time cannot be future dated.",
@@ -234,10 +317,54 @@ const deleteFoodEntryService = async (user, foodEntryId) => {
   }
 };
 
+const getAdminReportsService = async (user) => {
+  try {
+    logger.info("Inside getAdminReportsService.");
+
+    // Validating that current user is an Admin
+    if (user.role !== "Admin") {
+      return {
+        valid: false,
+        error: "Admin report data is accessible only for Admin users.",
+      };
+    }
+
+    let response = await db_getAdminReport();
+
+    return {
+      valid: true,
+      data: response,
+    };
+  } catch (error) {
+    logger.error("Error in getAdminReportsService");
+    console.log(error);
+    throw new Error();
+  }
+};
+
+  const getDailyLimitExceededReportService = async (user) => {
+    try {
+      logger.info("Inside getDailyLimitExceededReportService.");
+  
+      let response = await db_getDailyLimitExceededReport(user);
+  
+      return {
+        valid: true,
+        data: response,
+      };
+    } catch (error) {
+      logger.error("Error in getDailyLimitExceededReportService");
+      console.log(error);
+      throw new Error();
+    }
+  };
+
 module.exports = {
   getAllFoodEntriesService,
   getFoodEntryService,
   createFoodEntryService,
   updateFoodEntryService,
   deleteFoodEntryService,
+  getAdminReportsService,
+  getDailyLimitExceededReportService
 };

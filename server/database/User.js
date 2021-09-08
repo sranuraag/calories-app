@@ -31,11 +31,27 @@ const db_getUser = async (email) => {
   }
 };
 
+const db_getUserById = async (user_id) => {
+  try {
+    logger.info("Inside db_getUserById.");
+
+    let query = `select * from users where id = '${user_id}'`;
+
+    let result = await executeQuery(query);
+
+    return result;
+  } catch (error) {
+    logger.error("Error in db_getUserById");
+    console.log(error);
+    throw new Error();
+  }
+};
+
 const db_getAllUsers = async () => {
   try {
     logger.info("Inside db_getAllUsers.");
 
-    let query = `select id, email, first_name, last_name, role from users`;
+    let query = `select id, email, first_name, last_name, role from users where role != 'Admin'`;
 
     let result = await executeQuery(query);
 
@@ -51,5 +67,6 @@ const db_getAllUsers = async () => {
 module.exports = {
   db_createUser,
   db_getUser,
+  db_getUserById,
   db_getAllUsers
 };

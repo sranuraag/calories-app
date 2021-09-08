@@ -6,6 +6,8 @@ const {
   createFoodEntry,
   updateFoodEntry,
   deleteFoodEntry,
+  getAdminReports,
+  getDailyLimitExceededReport
 } = require("../controllers");
 
 const { authenticate } = require("../middlewares");
@@ -13,6 +15,10 @@ const { authenticate } = require("../middlewares");
 const FoodEntryRouter = express.Router();
 
 FoodEntryRouter.use(authenticate);
+
+FoodEntryRouter.get("/adminreports", getAdminReports)
+
+FoodEntryRouter.get("/daily_limit_exceeded_report", getDailyLimitExceededReport)
 
 FoodEntryRouter.get("/", getAllFoodEntries);
 

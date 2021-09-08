@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Controller for GET /users
+// Controller for GET /users/getAllUsers
 const getAllUsers = async (req, res) => {
   try {
     logger.info("Inside getAllUsers.");
@@ -97,4 +97,20 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUser, getAllUsers };
+// Controller for GET /users
+const getCurrentUser = async (req, res) => {
+  try {
+    logger.info("Inside getCurrentUser.");
+
+    let user = req.user;
+
+    return res.status(200).json({ status: "success", data: user });
+
+  } catch (error) {
+    logger.error("Error in getCurrentUser.");
+    console.log(error);
+    return res.status(500).json({ error: "Error while fetching user." });
+  }
+};
+
+module.exports = { createUser, loginUser, getAllUsers, getCurrentUser };

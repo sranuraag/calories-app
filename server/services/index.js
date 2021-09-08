@@ -5,6 +5,8 @@ const {
   createFoodEntryService,
   updateFoodEntryService,
   deleteFoodEntryService,
+  getAdminReportsService,
+  getDailyLimitExceededReportService
 } = require("./FoodEntry");
 
 module.exports = {
@@ -17,4 +19,6 @@ module.exports = {
   createFoodEntryService,
   updateFoodEntryService,
   deleteFoodEntryService,
+  getAdminReportsService,
+  getDailyLimitExceededReportService
 };

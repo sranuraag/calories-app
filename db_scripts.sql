@@ -14,8 +14,9 @@ create sequence foodentry_id_seq increment by 1 start with 1;
 
 create table foodentries (
 	id int default nextval('foodentry_id_seq') primary key,
-	datetime timestamp,
+	datetime timestamptz,
 	food text, 
 	calories float,
-	user_id int references users(id)
+	user_id int references users(id),
+	created_at timestamptz
 ); 

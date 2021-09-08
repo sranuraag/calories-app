@@ -11,12 +11,16 @@ import {
 import constants from "../../constants";
 import { Context } from "../../Context";
 import Loader from "../utils/Loader";
+import SignUpWidget from "../auth/SignUpWidget";
 
 export default class FoodEntries extends Component {
   static contextType = Context;
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      daily_limit_exceeded_data: [],
+      foodentries: []
+    };
   }
 
   foodentry_columns = [
@@ -73,9 +77,25 @@ export default class FoodEntries extends Component {
     },
   ];
 
-  componentWillMount = async () => {
+  daily_limit_exceeded_columns = [
+    {
+      title: "Date",
+      dataIndex: "formatted_date",
+      key: "formatted_date",
+    },
+    {
+      title: "Total Calories",
+      dataIndex: "total_calories",
+      key: "total_calories",
+    },
+    {
+      title: "User",
+      dataIndex: "email",
+      key: "email",
+    }
+  ];
 
-    console.log('Inside componentWillMount'); 
+  componentWillMount = async () => {
 
     this.setState({ loading: true });
 
@@ -83,6 +103,7 @@ export default class FoodEntries extends Component {
 
     if (role !== 'Admin') {
       this.foodentry_columns = this.foodentry_columns.filter(element => element.title !== 'User'); 
+      this.daily_limit_exceeded_columns = this.daily_limit_exceeded_columns.filter(element => element.title !== 'User'); 
     }
 
     let user_token = `Bearer ${window.localStorage.getItem("user_token")}`;
@@ -96,12 +117,17 @@ export default class FoodEntries extends Component {
       },
     };
 
-    let response = await axios(payload);
     let foodentries = [];
+    let daily_limit_exceeded_data = []; 
+    let response; 
 
-    if (response.status === 200) {
-      foodentries = response.data.data;
-    } else {
+    try {
+      response = await axios(payload);
+  
+      if (response.status === 200) {
+        foodentries = response.data.data;
+      }
+    } catch(error) {
       notification.error({
         message: `Error while fetching Food Entries.`,
         placement: "topright",
@@ -109,10 +135,32 @@ export default class FoodEntries extends Component {
       });
     }
 
-    console.log('Got data , setting state'); 
-    console.log(foodentries); 
+    payload = {
+      method: "GET",
+      url: `${constants.daily_limit_exceeded_report}`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: user_token,
+      },
+    };
 
-    this.setState({ foodentries, loading: false });
+    try {
+
+      response = await axios(payload);
+
+      if (response.status === 200) {
+        daily_limit_exceeded_data = response.data.data; 
+      }
+
+    } catch(error) {
+      notification.error({
+        message: `Error while fetching Daily Limit Exceeded report.`,
+        placement: "topright",
+        duration: 3,
+      });
+    }
+
+    this.setState({ foodentries, daily_limit_exceeded_data, loading: false });
   };
 
   handleCreateFoodEntry = () => {
@@ -144,15 +192,17 @@ export default class FoodEntries extends Component {
       },
     }
 
-    let response = await axios(payload); 
+    try {
+      let response = await axios(payload); 
 
-    if (response.status === 200) {
-      notification.success({
-        message: `Food Entry deleted successfully.`,
-        placement: "topright",
-        duration: 3,
-      });
-    } else {
+      if (response.status === 200) {
+        notification.success({
+          message: `Food Entry deleted successfully.`,
+          placement: "topright",
+          duration: 3,
+        });
+      }
+    } catch(error) {
       notification.error({
         message: `Error while deleting Food Entry.`,
         placement: "topright",
@@ -168,7 +218,7 @@ export default class FoodEntries extends Component {
 
   render() {
     return (
-      <div className="content-main p-5">
+      <div className="content-main p-5 mb-5">
         <div className="d-flex justify-content-between mb-5">
           <h5>Food Entries</h5>
           <Button
@@ -185,8 +235,21 @@ export default class FoodEntries extends Component {
             className="mt-3"
             columns={this.foodentry_columns}
             dataSource={this.state.foodentries}
-            pagination={false}
+            pagination={true}
+            rowClassName={(record, index) => record.total_calories > record.daily_limit ? 'daily-limit-exceeded' : 'daily-limit-not-exceeded'}
           />
+        </div>
+        <div className="mt-3"><strong>Daily Limit Exceeded Report</strong></div>
+        <div>
+          <Table
+            className="mt-3"
+            columns={this.daily_limit_exceeded_columns}
+            dataSource={this.state.daily_limit_exceeded_data}
+            pagination={true}
+          />
+        </div>
+        <div className="signup-widget">
+          <SignUpWidget />
         </div>
         <Loader />
       </div>

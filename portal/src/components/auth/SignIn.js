@@ -56,14 +56,16 @@ export default class SignIn extends Component {
       },
     };
 
-    let response = await axios(payload);
+    try {
+      let response = await axios(payload);
 
-    if (response.status === 200) {
-      window.localStorage.setItem("user_token", response.data.jwt);
-      this.context.setUser(response.data.user);
+      if (response.status === 200) {
+        window.localStorage.setItem("user_token", response.data.jwt);
+        this.context.setUser(response.data.user);
 
-      this.props.history.push("/food-entries");
-    } else {
+        this.props.history.push("/food-entries");
+      }
+    } catch (error) {
       notification.error({
         message: `Error during Sign In.`,
         placement: "topright",

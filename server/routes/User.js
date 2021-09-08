@@ -1,10 +1,12 @@
 const express = require("express");
-const { createUser, loginUser, getAllUsers } = require("../controllers");
+const { createUser, loginUser, getAllUsers, getCurrentUser } = require("../controllers");
 const { authenticate } = require("../middlewares"); 
 
 const UserRouter = express.Router();
 
-UserRouter.get("/", authenticate, getAllUsers);
+UserRouter.get("/", authenticate, getCurrentUser);
+
+UserRouter.get("/getAllUsers", authenticate, getAllUsers);
 
 UserRouter.post("/", createUser);
 

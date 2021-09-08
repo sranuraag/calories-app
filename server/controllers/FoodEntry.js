@@ -5,6 +5,8 @@ const {
   createFoodEntryService,
   updateFoodEntryService,
   deleteFoodEntryService,
+  getAdminReportsService,
+  getDailyLimitExceededReportService
 } = require("../services");
 
 // Controller for GET /foodentry
@@ -135,10 +137,57 @@ const deleteFoodEntry = async (req, res) => {
   }
 };
 
+
+// Controller for GET /foodentry/adminreports
+const getAdminReports = async (req, res) => {
+  try {
+    logger.info("Inside getAdminReports.");
+
+    let user = req.user;
+
+    // Call getAdminReportsService available in services folder
+    let response = await getAdminReportsService(user);
+
+    if (response.valid) {
+      return res.status(200).json({ data: response.data });
+    } else {
+      return res.status(400).json({ error: response.error });
+    }
+  } catch (error) {
+    logger.error("Error in getAdminReports.");
+    console.log(error);
+    return res.status(500).json({ error: "Error while fetching Admin reports data." });
+  }
+};
+
+// Controller for GET /foodentry/daily_limit_exceeded_report
+const getDailyLimitExceededReport = async (req, res) => {
+  try {
+    logger.info("Inside getDailyLimitExceededReport.");
+
+    let user = req.user;
+
+    // Call getDailyLimitExceededReportService available in services folder
+    let response = await getDailyLimitExceededReportService(user);
+
+    if (response.valid) {
+      return res.status(200).json({ data: response.data });
+    } else {
+      return res.status(400).json({ error: response.error });
+    }
+  } catch (error) {
+    logger.error("Error in getDailyLimitExceededReport.");
+    console.log(error);
+    return res.status(500).json({ error: "Error while fetching Daily Limit Exceeded Report." });
+  }
+};
+
 module.exports = {
   getAllFoodEntries,
   getFoodEntry,
   createFoodEntry,
   updateFoodEntry,
   deleteFoodEntry,
+  getAdminReports,
+  getDailyLimitExceededReport
 };

@@ -41,9 +41,6 @@ export default class SignUp extends Component {
       password = "",
     } = this.state;
 
-    console.log(firstName);
-    console.log(lastName);
-
     if (!(email && password)) {
       notification.error({
         message: `Email and Password are mandatory.`,
@@ -69,17 +66,19 @@ export default class SignUp extends Component {
       },
     };
 
-    let response = await axios(payload);
+    try {
+      let response = await axios(payload);
 
-    if (response.status === 201) {
-      notification.success({
-        message: `User created successfully.`,
-        placement: "topright",
-        duration: 3,
-      });
-
-      this.props.history.push("/signin");
-    } else {
+      if (response.status === 201) {
+        notification.success({
+          message: `User created successfully.`,
+          placement: "topright",
+          duration: 3,
+        });
+  
+        this.props.history.push("/signin");
+      }
+    } catch (error) {
       notification.error({
         message: `Error during User sign up.`,
         placement: "topright",

@@ -10,6 +10,7 @@ import {
   Table,
   DatePicker,
   Space,
+  AutoComplete,
   notification,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -17,6 +18,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import constants from "../../constants";
 import { Context } from "../../Context";
 import Loader from "../utils/Loader";
+import nutritionix from "../../images/NutritionixAPI_hires_flat.png";
 
 const { Option } = Select;
 
@@ -33,6 +35,8 @@ export default class CreateEditFoodEntry extends Component {
       loading: false,
       user_id: "",
       users: [],
+      options: [],
+      nutritionix_data: [],
     };
   }
 
@@ -40,7 +44,7 @@ export default class CreateEditFoodEntry extends Component {
     if (this.context.user.role === "Admin") {
       let payload = {
         method: "GET",
-        url: constants.users,
+        url: `${constants.users}/getAllUsers`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${window.localStorage.getItem("user_token")}`,
@@ -84,6 +88,12 @@ export default class CreateEditFoodEntry extends Component {
           placement: "topright",
           duration: 3,
         });
+      } else if (calories <= 0) {
+        notification.error({
+          message: `Calories should be greater than 0.`,
+          placement: "topright",
+          duration: 3,
+        });
       } else {
         this.setState({ calories: e.target.value });
       }
@@ -91,15 +101,14 @@ export default class CreateEditFoodEntry extends Component {
   };
 
   handleDateChange = (value, dateString) => {
-
     if (value) {
-      console.log(value.valueOf());
+      let datetime = value.toISOString();
 
-      let datetime = value.valueOf();
+      console.log(datetime);
 
       this.setState({ datetime });
     } else {
-      this.setState({ datetime: '' }); 
+      this.setState({ datetime: "" });
     }
   };
 
@@ -127,12 +136,29 @@ export default class CreateEditFoodEntry extends Component {
       return false;
     }
 
+    if (food.trim().length <= 0) {
+
+      notification.error({
+        message: `Food should have a valid value.`,
+        placement: "topright",
+        duration: 3,
+      });
+
+      this.setState({ loading: false });
+
+      return false;
+    }
+
     if (this.context.user.role === "Admin" && !user_id) {
       notification.error({
         message: `User selection is mandatory for Admin user.`,
         placement: "topright",
         duration: 3,
       });
+
+      this.setState({ loading: false });
+
+      return false;
     }
 
     if (this.context.user.role !== "Admin" && user_id) {
@@ -141,6 +167,10 @@ export default class CreateEditFoodEntry extends Component {
         placement: "topright",
         duration: 3,
       });
+
+      this.setState({ loading: false });
+
+      return false;
     }
 
     if (editing) {
@@ -159,15 +189,17 @@ export default class CreateEditFoodEntry extends Component {
         },
       };
 
-      response = await axios(payload);
+      try {
+        response = await axios(payload);
 
-      if (response.status === 200) {
-        notification.success({
-          message: `Food Entry edited successfully.`,
-          placement: "topright",
-          duration: 3,
-        });
-      } else {
+        if (response.status === 200) {
+          notification.success({
+            message: `Food Entry edited successfully.`,
+            placement: "topright",
+            duration: 3,
+          });
+        }
+      } catch (error) {
         notification.error({
           message: `Error while editing Food Entry.`,
           placement: "topright",
@@ -190,15 +222,17 @@ export default class CreateEditFoodEntry extends Component {
         },
       };
 
-      response = await axios(payload);
+      try {
+        response = await axios(payload);
 
-      if (response.status === 201) {
-        notification.success({
-          message: `Food Entry created successfully.`,
-          placement: "topright",
-          duration: 3,
-        });
-      } else {
+        if (response.status === 201) {
+          notification.success({
+            message: `Food Entry created successfully.`,
+            placement: "topright",
+            duration: 3,
+          });
+        }
+      } catch (error) {
         notification.error({
           message: `Error while creating Food Entry.`,
           placement: "topright",
@@ -214,6 +248,72 @@ export default class CreateEditFoodEntry extends Component {
 
   handleUserChange = (value) => {
     this.setState({ user_id: value });
+  };
+
+  handleFoodChange = async (value) => {
+    this.setState({ food: value });
+
+    let options = [];
+    let nutritionix_data = [];
+    let searchText = value;
+
+    if (searchText) {
+      let payload = {
+        method: "GET",
+        url: `${constants.nutritionix_api}?query=${searchText}&detailed=true`,
+        headers: {
+          "x-app-id": constants.nutritionix_app_id,
+          "x-app-key": constants.nutritionix_app_key,
+          "x-remote-user-id": constants.nutritionix_remote_user_id,
+        },
+      };
+
+      try {
+        let response = await axios(payload);
+
+        if (response.status === 200) {
+          if (response.data.branded && response.data.branded.length > 0) {
+            nutritionix_data = response.data.branded;
+          }
+          if (response.data.common && response.data.common.length > 0) {
+            nutritionix_data = nutritionix_data.concat(response.data.common);
+          }
+        }
+
+        options = nutritionix_data.map((element) => ({
+          value: element.food_name,
+        }));
+      } catch (error) {
+        notification.error({
+          message: `Error while fetching autocomplete results.`,
+          placement: "topright",
+          duration: 3,
+        });
+      }
+    }
+    this.setState({ options, nutritionix_data });
+  };
+
+  handleAutoCompleteSelect = (value) => {
+    let nutritionix_data = this.state.nutritionix_data;
+
+    let selectedOption = nutritionix_data.filter(
+      (element) => element.food_name === value
+    );
+
+    if (
+      selectedOption.length > 0 &&
+      selectedOption[0].full_nutrients &&
+      selectedOption[0].full_nutrients.length > 0
+    ) {
+      let calories = selectedOption[0].full_nutrients.filter(
+        (element) => element.attr_id === 208
+      );
+
+      if (calories.length > 0) {
+        this.setState({ calories: calories[0].value });
+      }
+    }
   };
 
   render() {
@@ -238,13 +338,24 @@ export default class CreateEditFoodEntry extends Component {
           <label for="food" className="field-label">
             Food Name
           </label>
-          <Input
+          {/* <Input
             placeholder="Food Name"
             value={this.state.food}
             onChange={(e) => this.handleChange(e, "food")}
             maxLength={100}
             style={{ maxWidth: "300px" }}
+          /> */}
+          <AutoComplete
+            options={this.state.options}
+            style={{
+              width: 300,
+            }}
+            value={this.state.food}
+            onSelect={this.handleAutoCompleteSelect}
+            onChange={this.handleFoodChange}
+            placeholder="Food Name"
           />
+          <img src={nutritionix} alt="Powered by Nutritionix" style={{ height: "30px", marginLeft: "10px" }}/>
         </div>
         <div className="d-flex mb-3">
           <label for="calories" className="field-label">
