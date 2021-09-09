@@ -36,3 +36,57 @@
     transform: rotate(360deg);
   }
 }
+
+.main {
+  height: 100vh;
+}
+
+.field-label {
+  width: 150px;
+}
+
+.signup-widget {
+  position: fixed; 
+  bottom: 0;
+  right: 0;
+  z-index: 1
+}
+
+.daily-limit-exceeded {
+  background: #fff2e8; 
+}
+
+.daily-limit-not-exceeded {
+  background: #e6fffb; 
+}
+
+.header-bar {
+  height: 100%;
+}
+
+.header-brand {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.header-content {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.user-logo {
+  font-size: 20px;
+}
+
+.logout:hover {
+  cursor: pointer;
+  color: white;
+}
+
+.invite-friend-widget-collapsed {
+  background: #1890ff;
+  border-radius: 10px;
+}
+
+.invite-friend-widget-expanded {
+  background: white;
+  border-radius: 10px;
+}

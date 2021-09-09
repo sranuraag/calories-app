@@ -1,9 +1,23 @@
-const express = require('express'); 
+require("dotenv").config();
+const express = require("express");
+const { UserRouter, FoodEntryRouter } = require("./routes");
+const { logger } = require("./utils"); 
 
-const app = express(); 
+const cors = require("cors");
 
-const PORT = process.env.PORT || 3001; 
+const app = express();
 
-app.listen(PORT, () => {
-    console.log(`Server running of port ${PORT}`)
-})
+app.use(cors());
+app.use(express.json());
+
+// Routes defined for different resources
+app.use("/users", UserRouter);
+app.use("/foodentry", FoodEntryRouter);
+
+const PORT = process.env.PORT || 3001;
+
+const application = app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+});
+
+module.exports = application; 
