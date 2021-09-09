@@ -8,7 +8,7 @@ const {
   db_deleteFoodEntry,
   db_getAdminReport,
   db_getUserById,
-  db_getDailyLimitExceededReport
+  db_getDailyLimitExceededReport,
 } = require("../database");
 
 const getAllFoodEntriesService = async (user) => {
@@ -92,6 +92,14 @@ const createFoodEntryService = async (
       return {
         valid: false,
         error: "Food should have a non-empty input.",
+      };
+    }
+
+    // Restrict food length to maximum of 100 characters
+    if (food.length > 100) {
+      return {
+        valid: false,
+        error: "Maximum allowed length for food is 100 characters.",
       };
     }
 
@@ -194,6 +202,14 @@ const updateFoodEntryService = async (
       return {
         valid: false,
         error: "Food should have a non-empty input.",
+      };
+    }
+
+    // Restrict food length to maximum of 100 characters
+    if (food.length > 100) {
+      return {
+        valid: false,
+        error: "Maximum allowed length for food is 100 characters.",
       };
     }
 
@@ -342,22 +358,22 @@ const getAdminReportsService = async (user) => {
   }
 };
 
-  const getDailyLimitExceededReportService = async (user) => {
-    try {
-      logger.info("Inside getDailyLimitExceededReportService.");
-  
-      let response = await db_getDailyLimitExceededReport(user);
-  
-      return {
-        valid: true,
-        data: response,
-      };
-    } catch (error) {
-      logger.error("Error in getDailyLimitExceededReportService");
-      console.log(error);
-      throw new Error();
-    }
-  };
+const getDailyLimitExceededReportService = async (user) => {
+  try {
+    logger.info("Inside getDailyLimitExceededReportService.");
+
+    let response = await db_getDailyLimitExceededReport(user);
+
+    return {
+      valid: true,
+      data: response,
+    };
+  } catch (error) {
+    logger.error("Error in getDailyLimitExceededReportService");
+    console.log(error);
+    throw new Error();
+  }
+};
 
 module.exports = {
   getAllFoodEntriesService,
@@ -366,5 +382,5 @@ module.exports = {
   updateFoodEntryService,
   deleteFoodEntryService,
   getAdminReportsService,
-  getDailyLimitExceededReportService
+  getDailyLimitExceededReportService,
 };

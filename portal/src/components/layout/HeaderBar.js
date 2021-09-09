@@ -22,7 +22,7 @@ class HeaderBar extends Component {
 
     if (e.key === 'food-entries') {
         this.props.history.push("/food-entries"); 
-    } else if (e.key === 'food-entries') {
+    } else if (e.key === 'admin-reports') {
         this.props.history.push("/admin-reports"); 
     }
   }
@@ -39,7 +39,7 @@ class HeaderBar extends Component {
           <div className="me-5">
             <h4 className="header-brand">Calories App</h4>
           </div>
-          <div>
+          <div style={{ width: "400px"}}>
             <Menu
               theme="dark"
               mode="horizontal"

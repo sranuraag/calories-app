@@ -104,8 +104,6 @@ export default class CreateEditFoodEntry extends Component {
     if (value) {
       let datetime = value.toISOString();
 
-      console.log(datetime);
-
       this.setState({ datetime });
     } else {
       this.setState({ datetime: "" });

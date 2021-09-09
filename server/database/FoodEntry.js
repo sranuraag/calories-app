@@ -298,6 +298,24 @@ const db_getDailyLimitExceededReport = async (user) => {
   }
 };
 
+// Re-insert FoodEntry record which was deleted as part of testing
+const db_insertTestData = async () => {
+  try {
+    logger.info("Inside db_insertTestData.");
+
+    let query = `insert into foodentries (id, datetime, food, calories, user_id, created_at) 
+    select 1, now(), 'Eggs', 250, id, now() from users where email = 'testuser01@example.com'`;
+
+    let response = await executeQuery(query);
+
+    return response;
+  } catch (error) {
+    logger.error("Error in db_insertTestData.");
+    console.log(error);
+    throw new Error();
+  }
+};
+
 module.exports = {
   db_getAllFoodEntries,
   db_getFoodEntry,
@@ -306,4 +324,5 @@ module.exports = {
   db_deleteFoodEntry,
   db_getAdminReport,
   db_getDailyLimitExceededReport,
+  db_insertTestData,
 };

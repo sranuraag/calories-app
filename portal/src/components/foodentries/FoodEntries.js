@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import axios from "axios";
 import moment from "moment"; 
-import { Button, Table, notification } from "antd";
+import { Button, Table, notification, Input, DatePicker } from "antd";
 import {
   EditOutlined,
   DeleteOutlined
@@ -13,13 +13,16 @@ import { Context } from "../../Context";
 import Loader from "../utils/Loader";
 import SignUpWidget from "../auth/SignUpWidget";
 
+const { RangePicker } = DatePicker;
+
 export default class FoodEntries extends Component {
   static contextType = Context;
   constructor(props) {
     super(props);
     this.state = {
       daily_limit_exceeded_data: [],
-      foodentries: []
+      foodentries: [],
+      searchText: ''
     };
   }
 
@@ -216,6 +219,10 @@ export default class FoodEntries extends Component {
 
   }
 
+  handleSearchTextChange = (e) => {
+    this.setState({ searchText: e.target.value }); 
+  }
+
   render() {
     return (
       <div className="content-main p-5 mb-5">
@@ -230,11 +237,19 @@ export default class FoodEntries extends Component {
             Create Food Entry
           </Button>
         </div>
+        <div className="d-flex justify-content-end">
+        <Input
+            placeholder="Search Food"
+            value={this.state.searchFood}
+            onChange={this.handleSearchTextChange}
+            style={{ maxWidth: "300px" }}
+          />
+        </div>
         <div>
           <Table
             className="mt-3"
             columns={this.foodentry_columns}
-            dataSource={this.state.foodentries}
+            dataSource={this.state.foodentries.filter(element => element.food.toLowerCase().includes(this.state.searchText.toLowerCase()))}
             pagination={true}
             rowClassName={(record, index) => record.total_calories > record.daily_limit ? 'daily-limit-exceeded' : 'daily-limit-not-exceeded'}
           />
