@@ -105,7 +105,7 @@ const db_createFoodEntry = async (datetime, food, calorie, user_id) => {
     logger.info("Inside db_createFoodEntry.");
 
     let query = `insert into foodentries (datetime, food, calories, user_id, created_at) values (
-            '${datetime}', '${food}', ${calorie}, ${user_id}, '${moment().toISOString()}'
+            '${datetime}', $$${food}$$, ${calorie}, ${user_id}, '${moment().toISOString()}'
         )`;
 
     let response = await executeQuery(query);
@@ -135,7 +135,7 @@ const db_updateFoodEntry = async (
       query += `datetime='${datetime}',`;
     }
     if (food) {
-      query += `food='${food}',`;
+      query += `food=$$${food}$$,`;
     }
     if (calories) {
       query += `calories=${calories},`;

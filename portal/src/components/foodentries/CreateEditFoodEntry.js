@@ -82,21 +82,26 @@ export default class CreateEditFoodEntry extends Component {
     } else if (field === "calories") {
       let calories = e.target.value;
 
-      if (isNaN(calories)) {
-        notification.error({
-          message: `Calories should be a number.`,
-          placement: "topright",
-          duration: 3,
-        });
-      } else if (calories <= 0) {
-        notification.error({
-          message: `Calories should be greater than 0.`,
-          placement: "topright",
-          duration: 3,
-        });
+      if (calories) {
+        if (isNaN(calories)) {
+          notification.error({
+            message: `Calories should be a number.`,
+            placement: "topright",
+            duration: 3,
+          });
+        } else if (calories <= 0) {
+          notification.error({
+            message: `Calories should be greater than 0.`,
+            placement: "topright",
+            duration: 3,
+          });
+        } else {
+          this.setState({ calories: e.target.value });
+        }
       } else {
         this.setState({ calories: e.target.value });
       }
+
     }
   };
 
