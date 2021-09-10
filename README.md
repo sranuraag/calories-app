@@ -1,6 +1,7 @@
 # Calories App
 
 Calories App is a simple tool that enables users to track their food consumption and restrict their calorie intake. 
+Please watch the video "Demo.mp4" available in the root folder of this repository for an overview of the App. 
 
 ## Features
 
@@ -25,6 +26,7 @@ This repository contains 2 folders - portal (React JS UI) and server (Express JS
 React JS UI
 ```sh
 Clone this repository
+cd Anuraag-Shimoga-Ramesh
 cd portal 
 npm install
 npm start
@@ -32,8 +34,9 @@ npm start
 Express JS Server
 ```sh
 Clone this repository
-Setup a PostgreSQL instance and provide DB details in server/.env 
-Execute server/db_scripts.sql in DB
+Setup a PostgreSQL instance and provide DB details in Anuraag-Shimoga-Ramesh/server/.env 
+Execute Anuraag-Shimoga-Ramesh/db_scripts.sql in DB
+cd Anuraag-Shimoga-Ramesh
 cd server
 npm install
 npm run devStart
@@ -42,9 +45,15 @@ npm run devStart
 API testing 
 
 ```sh
+cd Anuraag-Shimoga-Ramesh
 cd server
 npm test
 ```
+
+## Creating an Admin user
+Sign up a user from http://localhost:3000/signup
+Once user is successfully created, update the user's roles from DB using the below update : 
+update users set role = 'Admin' where email='admin@example.com'; 
 
 ## API Details 
 
